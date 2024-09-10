@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: github-connector-test
+  namespace: argo-cd
+spec:
+  generators:
+  - git:
+      directories:
+      - path: super-sample/*
+      - path: better-sample/*
+      repoURL: https://github.com/DVPE-cloud/argo-test
+      revision: HEAD
+  syncPolicy:
+    applicationsSync: create-delete
+  template:
+    metadata:
+      name: '{{ path.basenameNormalized }}'
+    spec:
+      destination:
+        name: in-cluster
+        namespace: '{{ path[0] }}'
+      ignoreDifferences:
+      - group: dynamodb.aws.crossplane.io
+        jsonPointers:
+        - /spec
+        - /metadata
+        kind: Table
+      project: default
+      source:
+        path: '{{ path }}'
+        repoURL: https://github.com/DVPE-cloud/argo-test
+        targetRevision: HEAD
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - RespectIgnoreDifferences=true

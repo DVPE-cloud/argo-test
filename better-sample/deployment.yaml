@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-autoscale-deployment
+  namespace: better-sample
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-autoscale
+  template:
+    metadata:
+      labels:
+        app: test-autoscale
+    spec:
+      containers:
+        - name: test-autoscale-container
+          image: nginx
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
